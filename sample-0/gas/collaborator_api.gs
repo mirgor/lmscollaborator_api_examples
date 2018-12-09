@@ -1,7 +1,6 @@
-var keyJWT;
-var URL = 'https://<your-domen>';
-
-function _getAccessToken(login, pass){
+function _getAccessToken(URL, login, pass){
+  var keyJWT;
+  var res;
   var options = {
     'method' : 'post',
     'contentType': 'application/json;charset=UTF-8',
@@ -17,20 +16,46 @@ function _getAccessToken(login, pass){
       Logger.log('User: ' + res.fullname + '\n' + keyJWT);
       break;
     case 400:  
-      keyJWT = '';
-      Logger.log('Ошибка доступа: ' + responseCode + '\n Пользователь не найден. Проверьте правильность ввода логина и пароля.');
+      keyJWT = 'Error 400';
+      Logger.log('Ошибка доступа: ' + responseCode + '\nПользователь не найден. Проверьте правильность ввода логина и пароля.');
       break;
     default:
-      keyJWT = '';
-      Logger.log('Ошибка доступа: ' + responseCode + '\n Проверьте, все ли параметры запроса правильные.');
+      keyJWT = 'Error ' + responseCode;
+      Logger.log('Ошибка доступа: ' + responseCode + '\nПроверьте, все ли параметры запроса правильные.');
       break;
   }
+  return keyJWT;
 }
 
-function test(){
-  _getAccessToken('<your-login>', '<your-pass>');
-  //Печатаем токен в текст активного документа
-  var body = DocumentApp.getActiveDocument().getBody();
-  var text = body.editAsText();
-  text.appendText('keyJWT:\n' + keyJWT);
+function _getResByCollaboratorAPI(apiKey, urlRequest) {
+  var response = UrlFetchApp.fetch(urlRequest, {
+    headers: {
+      'Authorization': 'Bearer ' + apiKey,
+      'Content-Type' : 'application/json;charset=UTF-8'
+    },
+    'method' : 'get',
+    'muteHttpExceptions' : true    
+  });
+  var responseCode = response.getResponseCode();
+  var res;
+  switch(responseCode) {
+    case 200:  
+      res = JSON.parse(response.getContentText());
+      Logger.log(res);
+      break;
+    case 400:  
+      res = 'Error 400';
+      Logger.log('Ошибка доступа: ' + responseCode + '\nПроверьте правильность ввода логина и пароля.');
+      break;
+    default:
+      res = 'Error ' + responseCode;
+      Logger.log('Ошибка доступа: ' + responseCode + 
+                '\nПроверьте, все ли параметры запроса правильные.\n' +
+                '\n' + urlRequest);
+      break;
+  }
+  return res;  
 }
+
+
+
