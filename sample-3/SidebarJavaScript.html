@@ -1,0 +1,251 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+  /**
+   * Run initializations on sidebar load.
+   */
+  $(function() {
+    // Assign handler functions to sidebar elements here, if needed.
+    $('#sidebar-start-button').click(onStartClick);
+    $('#sidebar-getlists-button').click(onGetListsClick); 
+    $('#sidebar-dublicate-current-button').click(onDublicateClick);
+    $('#sidebar-save-current-button').click(onSaveCurrentClick);
+    $('#sidebar-save-checked-button').click(onSaveCheckedClick);
+    $('#sidebar-delete-current-button').click(onDeleteCurrentClick);
+    $('#sidebar-save-kpi-button').click(onSaveKpiClick);
+    $('#sidebar-read-kpi-button').click(onReadKpiClick);
+
+    // Call the server here to retrieve any information needed to build
+    // the dialog, if necessary.
+  });
+
+  function onStartClick() {
+    this.disabled = true;
+    google.script.run
+        .withSuccessHandler(
+          function(msg, element) {
+            // Respond to success conditions here.
+            showStatus('Дерево цілей отримано');
+            element.disabled = false;
+          })
+        .withFailureHandler(
+          function(msg, element) {
+            // Respond to failure conditions here.
+            showStatus(msg, 'error');
+            element.disabled = false;
+          })
+        .withUserObject(this)
+        .getMboTree();
+  }
+
+  function onDublicateClick() {
+    this.disabled = true;
+    google.script.run
+        .withSuccessHandler(
+          function(msg, element) {
+            // Respond to success conditions here.
+            showStatus('Дерево цілей отримано');
+            element.disabled = false;
+          })
+        .withFailureHandler(
+          function(msg, element) {
+            // Respond to failure conditions here.
+            showStatus(msg, 'error');
+            element.disabled = false;
+          })
+        .withUserObject(this)
+        .dublicateActiveRow();
+  }
+
+
+  function onGetListsClick() {
+    this.disabled = true;
+    google.script.run
+        .withSuccessHandler(
+          function(msg, element) {
+            // Respond to success conditions here.
+            showStatus('Переліки знеачень оновлено');
+            element.disabled = false;
+          })
+        .withFailureHandler(
+          function(msg, element) {
+            // Respond to failure conditions here.
+            showStatus(msg, 'error');
+            element.disabled = false;
+          })
+        .withUserObject(this)
+        .onGetLists();
+  }
+
+  function onSaveCurrentClick() {
+    this.disabled = true;
+    google.script.run
+        .withSuccessHandler(
+          function(msg, element) {
+            // Respond to success conditions here.
+            showStatus('Поточний запис збережено.');
+            element.disabled = false;
+          })
+        .withFailureHandler(
+          function(msg, element) {
+            // Respond to failure conditions here.
+            showStatus(msg, 'error');
+            element.disabled = false;
+          })
+        .withUserObject(this)
+        .saveCurrentElement();
+  }
+
+  function onSaveCheckedClick() {
+    this.disabled = true;
+    google.script.run
+        .withSuccessHandler(
+          function(msg, element) {
+            // Respond to success conditions here.
+            showStatus('Поточний запис збережено.');
+            element.disabled = false;
+          })
+        .withFailureHandler(
+          function(msg, element) {
+            // Respond to failure conditions here.
+            showStatus(msg, 'error');
+            element.disabled = false;
+          })
+        .withUserObject(this)
+        .saveCheckedElements();
+  }
+
+  function onDeleteCurrentClick() {
+    this.disabled = true;
+    google.script.run
+        .withSuccessHandler(
+          function(msg, element) {
+            // Respond to success conditions here.
+            showStatus('Запис видалено.');
+            element.disabled = false;
+          })
+        .withFailureHandler(
+          function(msg, element) {
+            // Respond to failure conditions here.
+            showStatus(msg, 'error');
+            element.disabled = false;
+          })
+        .withUserObject(this)
+        .deleteCurrentElement();
+  }
+
+
+  function onReadKpiClick() {
+    this.disabled = true;
+    google.script.run
+        .withSuccessHandler(
+          function(msg, element) {
+            // Respond to success conditions here.
+            $('#text-kpi').val(msg);
+            showStatus('Поточні значення KPI отримано');
+            element.disabled = false;
+          })
+        .withFailureHandler(
+          function(msg, element) {
+            // Respond to failure conditions here.
+            showStatus(msg, 'error');
+            element.disabled = false;
+          })
+        .withUserObject(this)
+        .getKpiValue();
+  }
+  
+  function onSaveKpiClick() {
+    this.disabled = true;
+    var value = $('#text-kpi').val();
+    google.script.run
+        .withSuccessHandler(
+          function(msg, element) {
+            // Respond to success conditions here.
+            showStatus('Нові значеня KPI записано');
+            element.disabled = false;
+          })
+        .withFailureHandler(
+          function(msg, element) {
+            // Respond to failure conditions here.
+            showStatus(msg, 'error');
+            element.disabled = false;
+          })
+        .withUserObject(this)
+        .setKpiValue(value);
+  }
+
+
+
+  /**
+   * Calls the server to retrieve information from the sheet.
+   * Gets the value in the active cell, which is then placed in the
+   * sidebar text field.
+   */
+  function onPullClick() {
+    this.disabled = true;
+
+    // Gather any information that needs to be sent to the server here.
+
+    // Send the value to the server and handle the response.
+    google.script.run
+        .withSuccessHandler(
+          function(msg, element) {
+            // Respond to success conditions here.
+            $('#sidebar-value').val(msg);
+            showStatus('Pulled value successfully.');
+            element.disabled = false;
+          })
+        .withFailureHandler(
+          function(msg, element) {
+            // Respond to failure conditions here.
+            showStatus(msg, 'error');
+            element.disabled = false;
+          })
+        .withUserObject(this)
+        .getActiveValue();
+  }
+
+  /**
+   * Calls the server to modify the sheet.
+   * Replace the currently selected cell value with the value in the
+   * sidebar text field.
+   */
+  function onPutClick() {
+    this.disabled = true;
+
+    // Gather any information that needs to be sent to the server here.
+    var value = $('#sidebar-value').val();
+
+    // Send the value to the server and handle the response.
+    google.script.run
+        .withSuccessHandler(
+          function(msg, element) {
+            // Respond to success conditions here.
+            showStatus('Cell set to reference value: ' + value);
+            element.disabled = false;
+          })
+        .withFailureHandler(
+          function(msg, element) {
+            // Respond to failure conditions here.
+            showStatus(msg, 'error');
+            element.disabled = false;
+          })
+        .withUserObject(this)
+        .setActiveValue(value);
+  }
+
+  /**
+   * Displays the given status message in the sidebar.
+   *
+   * @param {String} msg The status message to display.
+   * @param {String} classId The message type (class id) that the message
+   *   should be displayed as.
+   */
+  function showStatus(msg, classId) {
+    $('#sidebar-status').removeClass().html(msg);
+    if (classId) {
+      $('#sidebar-status').addClass(classId);
+    }
+  }
+
+</script>
